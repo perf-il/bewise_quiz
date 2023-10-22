@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+
+  db:
+    image: postgres
+    container_name: db_quiz
+    command: -p 5432
+    expose:
+      - 5432
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: app_quiz
+    command: ["/code/deploy.sh"]
+    ports:
+      - '8000:8000'
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
